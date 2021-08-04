@@ -1,7 +1,9 @@
+/* eslint-disable jsx-a11y/alt-text */
 import React, { Component } from 'react';
 import './App.css';
 import TodoItem from './component/TodoItem';
 import TrafficLight from './component/TrafficLight';
+import tick from './image/tick.svg';
 
 const RED = 0;
 const YELLOW = 1;
@@ -11,13 +13,19 @@ class App extends Component {
     super();
 
     this.state = {
+        checkAll: false,
         currentColor: RED,
+        newItem: '',
         todoItems: [
           { title : 'Go to market', isComplete: false },
           { title : 'Go fishing', isComplete: false},
           { title : 'Go to the cinema', isComplete: false }
         ]
     };
+
+    this.onKeyUp = this.onKeyUp.bind(this);
+    this.onChange = this.onChange.bind(this);
+    this.onCheckAll = this.onCheckAll.bind(this);
   }
 
   componentDidMount() {
@@ -57,12 +65,61 @@ class App extends Component {
     }
   }
 
+  onKeyUp(event) {
+    let text = event.target.value;
+    if(event.keyCode === 13) {
+      if(!text) {
+        return;
+      }
+      this.setState({
+        newItem: '',
+        todoItems: [
+          { title: text, isComplete: false },
+          ...this.state.todoItems
+        ]
+      })
+    }
+  }
+
+  onChange(event) {
+    this.setState({
+      newItem: event.target.value
+    });
+  }
+
+  onCheckAll() {
+    this.setState({
+      checkAll: !this.state.checkAll
+    })
+    return setTimeout(() => {
+      let newToDoItems = this.state.todoItems;
+      let checkAll = this.state.checkAll;
+      if(checkAll) {
+        newToDoItems.map((item) => 
+          item.isComplete = true
+        )
+      }
+      else{
+        newToDoItems.map((item) => 
+          item.isComplete = false
+        )
+      }
+      this.setState({
+        todoItems: newToDoItems
+      })
+    },10)   
+  }
+
   render() {
-    const { currentColor } = this.state;
-    const { todoItems } = this.state;
+    const { todoItems, newItem, currentColor } = this.state;
     if(todoItems.length) {
       return (
         <div className="App">
+          <div className="Header">
+            <img onClick={this.onCheckAll} src={tick} width={32} height={32} />
+            <input onChange={this.onChange} value={newItem} type='text' placeholder="Add a item" onKeyUp={this.onKeyUp} />
+          </div>
+
           { todoItems.length > 0 && todoItems.map((item, index) => 
               <TodoItem key={index} item={item} onClick={this.onItemClicked(item)} />
             )
@@ -71,10 +128,8 @@ class App extends Component {
           <TrafficLight currentColor={currentColor} />
         </div>
       );
-    }
-    
+    }  
   }
-  
 }
 
 export default App;
