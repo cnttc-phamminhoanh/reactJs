@@ -87,27 +87,32 @@ class App extends Component {
     });
   }
 
-  onCheckAll() {
-    this.setState({
-      checkAll: !this.state.checkAll
+  changeStateCheckAll() {
+    return new Promise(resolve => {  
+      resolve(this.setState({
+        checkAll: !this.state.checkAll
+        })
+      )
     })
-    return setTimeout(() => {
-      let newToDoItems = this.state.todoItems;
-      let checkAll = this.state.checkAll;
-      if(checkAll) {
-        newToDoItems.map((item) => 
-          item.isComplete = true
-        )
-      }
-      else{
-        newToDoItems.map((item) => 
-          item.isComplete = false
-        )
-      }
-      this.setState({
-        todoItems: newToDoItems
-      })
-    },10)   
+  }
+
+  async onCheckAll() {
+    await this.changeStateCheckAll();
+    let newToDoItems = this.state.todoItems;
+    let checkAll = this.state.checkAll;
+    if(checkAll) {
+      newToDoItems.map((item) => 
+        item.isComplete = true
+      )
+    }
+    else{
+      newToDoItems.map((item) => 
+        item.isComplete = false
+      )
+    }
+    this.setState({
+      todoItems: newToDoItems
+    })  
   }
 
   render() {
