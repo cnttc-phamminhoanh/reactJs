@@ -1,9 +1,12 @@
-/* eslint-disable jsx-a11y/alt-text */
+/* eslint-disable jsx-a11y/img-redundant-alt */
 import React, { Component } from 'react';
 import './App.css';
 import TodoItem from './component/TodoItem';
 import TrafficLight from './component/TrafficLight';
+import PropsChildren from './component/PropsChildren';
+// import PropTypes from 'prop-types';
 import tick from './image/tick.svg';
+import close from './image/cancel.svg';
 
 const RED = 0;
 const YELLOW = 1;
@@ -12,8 +15,10 @@ class App extends Component {
   constructor() {
     super();
 
+    this.inputElment = React.createRef();
+
     this.state = {
-        checkAll: false,
+        // checkAll: false,
         currentColor: RED,
         newItem: '',
         todoItems: [
@@ -26,9 +31,11 @@ class App extends Component {
     this.onKeyUp = this.onKeyUp.bind(this);
     this.onChange = this.onChange.bind(this);
     this.onCheckAll = this.onCheckAll.bind(this);
+    this.onCloseAll = this.onCloseAll.bind(this);
   }
 
   componentDidMount() {
+    this.inputElment.current.focus();
     setInterval(() => {
       this.setState({ 
         currentColor: this.getNextColor(this.state.currentColor)
@@ -87,29 +94,49 @@ class App extends Component {
     });
   }
 
-  changeStateCheckAll() {
-    return new Promise(resolve => {  
-      resolve(this.setState({
-        checkAll: !this.state.checkAll
-        })
-      )
-    })
+  // changeStateCheckAll() {
+  //   return new Promise(resolve => {  
+  //     resolve(this.setState({
+  //       checkAll: !this.state.checkAll
+  //       })
+  //     )
+  //   })
+  // }
+
+  // async onCheckAll() {
+  //   await this.changeStateCheckAll();
+  //   let newToDoItems = this.state.todoItems;
+  //   let checkAll = this.state.checkAll;
+  //   if(checkAll) {
+  //     newToDoItems.map((item) => 
+  //       item.isComplete = true
+  //     )
+  //   }
+  //   else{
+  //     newToDoItems.map((item) => 
+  //       item.isComplete = false
+  //     )
+  //   }
+  //   this.setState({
+  //     todoItems: newToDoItems
+  //   })  
+  // }
+
+  onCheckAll() {  
+    let newToDoItems = this.state.todoItems;
+    newToDoItems.map((item) => 
+      item.isComplete = true
+    )  
+    this.setState({
+      todoItems: newToDoItems
+    })  
   }
 
-  async onCheckAll() {
-    await this.changeStateCheckAll();
+  onCloseAll() {
     let newToDoItems = this.state.todoItems;
-    let checkAll = this.state.checkAll;
-    if(checkAll) {
-      newToDoItems.map((item) => 
-        item.isComplete = true
-      )
-    }
-    else{
-      newToDoItems.map((item) => 
-        item.isComplete = false
-      )
-    }
+    newToDoItems.map((item) => 
+      item.isComplete = false
+    )
     this.setState({
       todoItems: newToDoItems
     })  
@@ -121,8 +148,9 @@ class App extends Component {
       return (
         <div className="App">
           <div className="Header">
-            <img onClick={this.onCheckAll} src={tick} width={32} height={32} />
-            <input onChange={this.onChange} value={newItem} type='text' placeholder="Add a item" onKeyUp={this.onKeyUp} />
+            <img onClick={this.onCheckAll} src={tick} width={32} height={32} alt="description of image" />
+            <img onClick={this.onCloseAll} style={{paddingLeft: '5px'}} src={close} width={32} height={32} alt="button close all image" />
+            <input onChange={this.onChange} ref={this.inputElment} value={newItem} type='text' placeholder="Add a item" onKeyUp={this.onKeyUp} />
           </div>
 
           { todoItems.length > 0 && todoItems.map((item, index) => 
@@ -131,10 +159,22 @@ class App extends Component {
           }
   
           <TrafficLight currentColor={currentColor} />
+
+          <PropsChildren heading="Private web">
+            Now you can browse privately, and other people who use this device won’t see your activity. However, downloads, bookmarks and reading list items will be saved. 
+          </PropsChildren>
         </div>
       );
     }  
   }
 }
+
+// TodoItem.PropTypes = {
+//   item: PropTypes.shape({
+//     isComplete: PropTypes.bool,
+//     title: PropTypes.string
+//   }),
+//   onClick: PropTypes.func
+// }
 
 export default App;
